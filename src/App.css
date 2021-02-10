@@ -7,7 +7,7 @@ body {
 }
 
 body, .app {
-  background: white;
+  background: #f5f7f6;
 }
 
 /* main page */
@@ -27,6 +27,7 @@ body, .app {
 .list-books-content {
   padding: 0 0 80px;
   flex: 1;
+  background-color: #f5f7f6;
 }
 
 .bookshelf {
