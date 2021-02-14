@@ -1,72 +1,79 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { search } from "../BooksAPI";
 
-const Search = ()=>{
+import noData from "../icons/no_search.png";
+import loading from "../icons/loading.gif";
+
+import { search } from "../BooksAPI";
+import BookCard from "./BookCard";
+
+const Search = () => {
   const [query, setQuery] = useState('');
   const [searchList, setSearchList] = useState([]);
-  useEffect(()=>{
-    if(query.length > 0){
-      search(query).then(response=>{
+  const [searchState, setSearchState] = useState('NO-SEARCH');
+
+  useEffect(() => {
+    if (query.length > 0) {
+      setSearchState('LOADING');
+      search(query).then(response => {
         console.log(response)
-        debugger
-      }).then()}
-  },[query]);
-  const onSearch = (event)=>{
-    if(event.target.value !== "")
-    this.setState({query : event.target.value})
+        if (response.length > 0) {
+          setSearchList(response);
+          setSearchState('SEARCH-SUCCESS');
+        } else {
+          setSearchList([]);
+          setSearchState('NO-DATA-Found');
+        }
+      })
+    } else {
+      setSearchList([]);
+      setSearchState('NO-SEARCH');
+    }
+  }, [query]);
+
+  const onSearch = (event) => {
+    setQuery(event.target.value)
+  };
+
+  const bindSearchResult = () => {
+    switch (searchState) {
+      case 'NO-SEARCH':
+        return (
+          <div className="search-books-results">
+            <p>Search for a book</p>
+          </div>)
+        break;
+      case 'NO-DATA-Found':
+        return <img className="loading-img" src={noData} alt="No Data Found!" />
+        break;
+      case 'LOADING':
+        return <img className="loading-img" src={loading} alt="loading..." />
+        break;
+      case 'SEARCH-SUCCESS':
+        return ((searchList.length > 0) && (
+          <div className="search-books-results">
+            <ol className="books-grid" >
+              {searchList.map((book) => {
+                return (<li key={book.id} ><BookCard bookDetails={book} /></li>)
+              })}
+            </ol>
+          </div>
+        ))
+        break;
+      default:
+        break;
+    }
   }
-    return(
-      <div className="search-books">
+  return (
+    <div className="search-books">
       <div className="search-books-bar">
-      <Link className="close-search"  to="/"></Link>
-        {/* <button className="close-search" onClick={() => this.setState({ showSearchPage: false })}>Close</button> */}
+        <Link className="close-search" to="/"></Link>
         <div className="search-books-input-wrapper">
-          <input type="text" placeholder="Search by title or author" value={this.state.query} onChange={this.onSearch} />
+          <input type="text" placeholder="Search by title or author" value={query} onChange={(event) => setQuery(event.target.value)} />
         </div>
       </div>
-      <div className="search-books-results">
-        <ol className="books-grid"></ol>
-      </div>
+      {bindSearchResult()}
     </div>
   )
 }
-//#region class component for search
-// class Search extends React.Component{
-//   constructor(props){
-//       super(props);
-//       this.state = {
-//         query: '',
-//         searchList:[]
-//       }
-//   }
-//   onSearch = (event)=>{
-//     const {query} = this.state
-//     this.setState({query : event.target.value})
-//     if(this.state.query.length > 0 && event.target.value !== query){
-//       search(event.target.value).then(response=>{
-//         console.log(response)
-//         debugger
-//       }).then()
-//     }
-
-// }
-//   render(){
-//       return(
-//           <div className="search-books">
-//           <div className="search-books-bar">
-//           <Link className="close-search"  to="/"></Link>
-//             {/* <button className="close-search" onClick={() => this.setState({ showSearchPage: false })}>Close</button> */}
-//             <div className="search-books-input-wrapper">
-//               <input type="text" placeholder="Search by title or author" value={this.state.query} onChange={this.onSearch} />
-//             </div>
-//           </div>
-//           <div className="search-books-results">
-//             <ol className="books-grid"></ol>
-//           </div>
-//         </div>
-//       )
-//   }
-// }
-//#endregion
 export default Search;

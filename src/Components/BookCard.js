@@ -1,6 +1,6 @@
 import React from 'react';
 import DDL from './DDL';
-import {update} from '../BooksAPI';
+import { update } from '../BooksAPI';
 import PropTypes from "prop-types";
 
 
@@ -10,7 +10,7 @@ class BookCard extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      bookStatus: this.props.bookDetails.shelf
+      bookStatus: this.props.bookDetails.shelf ? this.props.bookDetails.shelf : ''
     }
   }
   componentWillReceiveProps(nextProps) {
@@ -19,15 +19,15 @@ class BookCard extends React.Component {
     }
   }
   onDDLChange = (event) => {
-      update(this.props.bookDetails, event.currentTarget.value).then((res)=>{
-          debugger
-          this.props.listUpdated()
-      }).then()
+    update(this.props.bookDetails, event.currentTarget.value).then((res) => {
+      debugger
+      if (this.props.listUpdated) this.props.listUpdated()
+    }).then()
     console.log(event.currentTarget.value);
 
   }
   render() {
-    const { title, authors, imageLinks } = this.props.bookDetails;
+    const { title = '', authors = [], imageLinks = '' } = this.props.bookDetails;
 
     return (
       <div className="book">
